@@ -1,54 +1,50 @@
 #include <Encoder.h>
 #include <PID_v1.h>
 
-// pin connections
+// Pin Connections.
 #define LOAD_CELL A1
 #define TOP_LS 8
 #define BOTTOM_LS 9
 
-#define MOTOR_RIGHT 6
 #define MOTOR_LEFT 5
+#define MOTOR_RIGHT 6
 
 #define MAGNET_A 12
 #define MAGNET_B 13
 
-// Setpoints
-#define CMD_L1 "floor"
-#define SET_L1 0
+// Named Setpoints
+#define FLOOR_SETPOINT 0
+#define KNEE_SETPOINT 2000
+#define WAIST_SETPOINT 20000
+#define CHEST_SETPOINT 25000
 
-#define CMD_L2 "knee"
-#define SET_L2 2000
-
-#define CMD_L3 "waist"
-#define SET_L3 20000
-
-#define CMD_L4 "chest"
-#define SET_L4 25000
-
+// Commands for Setpoints
+#define CMD_FLOOR "floor"
+#define CMD_KNEE "knee"
+#define CMD_WAIST "waist"
+#define CMD_CHEST "chest"
 
 Encoder encoder(2, 3);
 
-bool magnetEngaged = false;
+bool isMagnetEngaged = false;
+bool isMovingToSetpoint = false;
+bool isBottomLSSticky = false;
 
 double setpoint = 0;
-bool goingToSetpoint = false;
-
-bool bottomLSSticky = false;
-
 double currentMotorSpeed = 0;
 
 void setup() {
   Serial.begin(115200);
   Serial.setTimeout(5);
 
-  // Input
+  // Inputs
   pinMode(LOAD_CELL, INPUT);
   pinMode(TOP_LS, INPUT_PULLUP);
   pinMode(BOTTOM_LS, INPUT_PULLUP);
 
-  // Output
-  pinMode(MOTOR_RIGHT, OUTPUT);
+  // Outputs
   pinMode(MOTOR_LEFT, OUTPUT);
+  pinMode(MOTOR_RIGHT, OUTPUT);
   pinMode(MAGNET_A, OUTPUT);
   pinMode(MAGNET_B, OUTPUT);
   
@@ -58,138 +54,125 @@ void setup() {
   digitalWrite(MAGNET_A, LOW);
   digitalWrite(MAGNET_B, LOW);
 
-  magnetDisengage();
+  stopMotor();
+  disengageMagnet();
 }
 
 void loop() {
-  // Serial.print(bottomLSPressed());
-
-  if (Serial.available() != 0) {
-    handleSerialInput();
+  if (Serial.available()) {
+    processSerialCommand();
   }
 
-  if (bottomLSPressed()) {
-    bottomLSSticky = true;
+  // Update Bottom LS Sticky State.
+  if (isBottomLSPressed()) {
+    isBottomLSSticky = true;
   }
 
-  if (bottomLSPressed() && setpoint < encoder.readAndReset()) {
+  // Reset Setpoint if Bottom LS is Pressed and Position Overshoots.
+  if (isBottomLSPressed() && setpoint < encoder.readAndReset()) {
     setpoint = 0;
-    goingToSetpoint = false;
+    isMovingToSetpoint = false;
   }
 
-  if (topLSPressed() && setpoint > encoder.read()) {
+  // Adjust Setpoint if Top LS is Pressed and Position Overshoots.
+  if (isTopLSPressed() && setpoint > encoder.read()) {
     setpoint = encoder.read();
-    goingToSetpoint = false;
+    isMovingToSetpoint = false;
   }
 
-  if (goingToSetpoint) {
-    handleSetpointMovement();
+  if (isMovingToSetpoint) {
+    moveToSetpoint();
   }
-  updateMotor();
+
+  updateMotorOutputs();
 }
 
-void handleSerialInput() {
-  Serial.println("Reading commands");
+void processSerialCommand() {
   String command = Serial.readString();
   command.trim();
-  Serial.println(command);
 
   if (command == "u") {
-    moveMotorUp();
+    moveBySteps(1200);
   } else if (command == "d") {
-    moveMotorDown();
+    moveBySteps(-1200);
   } else if (command == "e") {
-    magnetEngage();
+    engageMagnet();
   } else if (command == "r") {
-    magnetDisengage();
-  } else if (command == CMD_L1) {
-    setSetpoint(SET_L1);
-  } else if (command == CMD_L2) {
-    setSetpoint(SET_L2);
-  } else if (command == CMD_L3) {
-    setSetpoint(SET_L3);
-  } else if (command == CMD_L4) {
-    setSetpoint(SET_L4);
+    disengageMagnet();
+  } else if (command == CMD_FLOOR) {
+    setSetpoint(FLOOR_SETPOINT);
+  } else if (command == CMD_KNEE) {
+    setSetpoint(KNEE_SETPOINT);
+  } else if (command == CMD_WAIST) {
+    setSetpoint(WAIST_SETPOINT);
+  } else if (command == CMD_CHEST) {
+    setSetpoint(CHEST_SETPOINT);
   } else if (command == "encoder") {
     Serial.println(encoder.read());
   } else if (command == "topls") {
-    Serial.println(topLSPressed());
+    Serial.println(isTopLSPressed());
   } else if (command == "bottomls") {
-    Serial.println(bottomLSPressed());
+    Serial.println(isBottomLSPressed());
   } else if (command == "stickyls") {
-    Serial.println(bottomLSSticky);
+    Serial.println(isBottomLSSticky);
   } else if (command == "clearstickyls") {
-    bottomLSSticky = false; 
+    isBottomLSSticky = false; 
   } else if (command == "zero") {
     encoder.readAndReset();
   } else {
-    Serial.println("No such command");
+    Serial.println("Unknown Command!");
   }
 }
 
-bool setSetpoint(double set) {
-  goingToSetpoint = true;
-  setpoint = set;
+void setSetpoint(double newSetpoint) {
+  setpoint = newSetpoint;
+  isMovingToSetpoint = true;
 }
 
-void handleSetpointMovement() {
-  if (!goingToSetpoint) { return; }
+void moveBySteps(int steps) {
+  setSetpoint(encoder.read() + steps);
+}
 
-  if (abs(encoder.read() - setpoint) < 100) {
-    goingToSetpoint = false;
+void moveToSetpoint() {
+  long currentPos = encoder.read();
+  long error = setpoint - currentPos;
+
+  if (abs(error) < 100) {
+    isMovingToSetpoint = false;
     stopMotor();
-    magnetEngage();
+    engageMagnet();
   } else {
-    magnetDisengage();
-    setMotorSpeed((setpoint > encoder.read()) ? 100 : -100);
+    disengageMagnet();
+    setMotorSpeed((error > 0) ? 100 : -100);
   }
 }
 
 void setMotorSpeed(int speed) {
   currentMotorSpeed = speed;
-  updateMotor();
+  updateMotorOutputs();
 }
 
-void updateMotor() {
-  int finalSpeed = currentMotorSpeed;
+void updateMotorOutputs() {
+  int adjustedSpeed = currentMotorSpeed;
 
-  // Handle limit switches
-  if (topLSPressed()) {
-    finalSpeed = min(0, currentMotorSpeed);
+  // Prevent movement past top limit switch.
+  if (isTopLSPressed()) {
+    adjustedSpeed = min(0, adjustedSpeed);
   }
 
-  if (bottomLSPressed()) {
-    finalSpeed = max(0, currentMotorSpeed);
+  // Prevent movement past bottom limit switch.
+  if (isBottomLSPressed()) {
+    adjustedSpeed = max(0, adjustedSpeed);
   }
   
-  // Write to motors
-  if (!magnetEngaged) {
-    currentMotorSpeed = finalSpeed;
-    analogWrite(MOTOR_RIGHT, -min(0, finalSpeed));
-    analogWrite(MOTOR_LEFT, max(0, finalSpeed));
-  } else {
+  // Write to Motors.
+  if (isMagnetEngaged) {
     stopMotor();
+  } else {
+    analogWrite(MOTOR_RIGHT, -min(0, adjustedSpeed));
+    analogWrite(MOTOR_LEFT, max(0, adjustedSpeed));
+    currentMotorSpeed = adjustedSpeed;
   }
-}
-
-void moveMotorUp() {
-  // goingToSetpoint = false;
-  // magnetDisengage();
-  // setMotorSpeed(100);
-  // delay(500);
-  // stopMotor();
-  // magnetEngage();
-  setSetpoint(encoder.read() + 1200);
-}
-
-void moveMotorDown() {
-  // goingToSetpoint = false;
-  // magnetDisengage();
-  // setMotorSpeed(-100);
-  // delay(500);
-  // stopMotor();
-  // magnetEngage();
-  setSetpoint(encoder.read() - 1200);
 }
 
 void stopMotor() {
@@ -198,40 +181,37 @@ void stopMotor() {
   currentMotorSpeed = 0;
 }
 
-void magnetEngage() {
+void engageMagnet() {
   digitalWrite(MAGNET_A, HIGH);
   digitalWrite(MAGNET_B, HIGH);
-
-  magnetEngaged = true;
+  isMagnetEngaged = true;
 }
 
-void magnetDisengage() {
+void disengageMagnet() {
   digitalWrite(MAGNET_A, LOW);
   digitalWrite(MAGNET_B, LOW);
-
-  magnetEngaged = false;
+  isMagnetEngaged = false;
 }
 
-bool topLSPressed() {
-  return digitalRead(TOP_LS);
+bool isTopLSPressed() {
+  return digitalRead(TOP_LS) == LOW;
 }
 
-bool bottomLSPressed() {
-  return digitalRead(BOTTOM_LS);
+bool isBottomLSPressed() {
+  return digitalRead(BOTTOM_LS) == LOW;
 }
 
 void printData() {
-
   Serial.print("Encoder: ");
   Serial.print(encoder.read());
   Serial.println();
 
   Serial.print("Top Limit Switch: ");
-  Serial.print(topLSPressed());
+  Serial.print(isTopLSPressed());
   Serial.println();
 
   Serial.print("Bottom Limit Switch: ");
-  Serial.print(bottomLSPressed());
+  Serial.print(isBottomLSPressed());
   Serial.println();
 
   Serial.print("Load Cell: ");
