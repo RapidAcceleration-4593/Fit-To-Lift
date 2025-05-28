@@ -3,7 +3,7 @@ import os
 from PySide6.QtWidgets import QApplication 
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from PySide6.QtCore import QUrl
-from gui.arduino import Arduino
+from backend import Arduino
 
 if __name__ == '__main__':
     config_path = os.path.join(os.path.dirname(__file__), "qtquickcontrols2.conf")
