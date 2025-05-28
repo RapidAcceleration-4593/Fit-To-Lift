@@ -1,1 +1,8 @@
+# IDE Configuration Files
 .vscode/
+
+# Python Virtual Enviornments
+.venv/
+
+# Python Caches
+__pycache__/
