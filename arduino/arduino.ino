@@ -18,8 +18,8 @@
 #define READ_CELL_CMD "r"
 #define STATUS_CMD "st"
 #define E_STOP_CMD "e"
-#define CMD_SEP "\n"
-#define CMD_PAYLOAD_SEP " "
+#define CMD_SEP '\n' // The character that separates commands from each other
+#define SEPARATOR ' ' // The character that separates expressions within the same command
 
 Encoder encoder(2, 3);
 
@@ -81,43 +81,28 @@ void loop() {
 }
 
 void handleSerialInput() {
-  String input = Serial.readString();
-  String substring;
+  while (Serial.available()) {
+    String input = Serial.readStringUntil(CMD_SEP);
+    input.trim();
+    input.toLowerCase();
 
-  int lastIndex = 0;
-  int nextIndex = 0;
-  
-  // Break the input string up into substrings, and execute each substring
-  while (nextIndex != -1 && lastIndex < input.length() - 1) {
-    lastIndex = nextIndex;
-    nextIndex = input.indexOf(CMD_SEP, lastIndex + 1);
-    substring = input.substring(lastIndex, (nextIndex == -1) ? input.length() : nextIndex);
-    handleSerialCommand(substring);
+    // Note: if the command and payload are separated by multiple separators in serial, executeCommand will not recognize the command
+    int separatingIndex = input.indexOf(SEPARATOR);
+
+    String command;
+    String payload;
+
+    if (separatingIndex != -1) {
+      command = input.substring(0, separatingIndex);
+      payload = input.substring(separatingIndex + 1);
+    } else {
+      command = input;
+    }
+    executeCommand(command, payload);
   }
-}
-
-void handleSerialCommand(String serial) {
-  String fullText = String(serial);
-  fullText.trim();
-  fullText.toLowerCase();
-  int separatingIndex = fullText.indexOf(CMD_PAYLOAD_SEP);
-
-  // Note: if the command and payload are separated by multiple separators in serial, executeCommand will not recognize the command
-
-  String command;
-  String payload;
-
-  if (separatingIndex != -1) {
-    command = fullText.substring(0, separatingIndex);
-    payload = fullText.substring(separatingIndex + 1);
-  } else {
-    command = fullText;
-  }
-  executeCommand(command, payload);
 }
 
 void executeCommand(String command, String payload) {
-
   if (command == UP_CMD) {
     bumpMotorUp();
   } else if (command == DOWN_CMD) {
@@ -131,22 +116,6 @@ void executeCommand(String command, String payload) {
     printStatus();
   } else if (command == E_STOP_CMD) {
     emergencyStop();
-  } else {
-    Serial.println("ERROR: NO COMMAND");
-  }
-
-}
-
-void readSerialCommand(String &command, String &payload) {
-  String text = Serial.readString();
-  text.trim();
-  int firstSpaceIndex = text.indexOf(" ");
-
-  if (firstSpaceIndex != -1) {
-    command = text.substring(0, firstSpaceIndex);
-    payload = text.substring(firstSpaceIndex + 1);
-  } else {
-    command = text;
   }
 }
 
@@ -245,12 +214,12 @@ void printStatus() {
   Serial.println();
 
   Serial.print("Load Cell: ");
-  Serial.println(analogRead(LOAD_CELL));
+  Serial.println(readLoadCellLbs());
   Serial.println();
 }
 
 void printLoadCellReading() {
-  Serial.print(readLoadCellLbs());
+  Serial.println(readLoadCellLbs());
 }
 
 double readLoadCellLbs() {

@@ -1,21 +1,21 @@
 import QtQuick
 import QtQuick.Controls
-import "../scripts/TestManager.js" as TestManager
 
 Item {
     id: testScreen
     width: 1280
     height: 720
     visible: true
-    anchors.fill: parent
+    anchors.fill: stackView.view
 
-    property string testName: TestManager.getCurrentTest().name
-    property string instructionsText: TestManager.getCurrentTest().instructions
+    property string testName: services.getCurrentTestName()
+    property string instructionsText: services.getCurrentTestInstructions()
 
     property int preCountdown: 3
     property int testCountdown: 5
     property bool isTesting: false
 
+    signal goToTest()
     signal goToHomeScreen()
     signal goToInstructions()
     signal goToConfiguration()
@@ -32,6 +32,7 @@ Item {
                 preTimer.stop()
                 testTimer.start()
                 isTesting = true
+                services.beginMeasuring(5.5)
             }
         }
     }
@@ -45,14 +46,16 @@ Item {
             if (testCountdown <= 0) {
                 testTimer.stop()
                 isTesting = false
+                services.finishMeasuring()
 
                 // TODO: Write results to file.
 
-                TestManager.nextTest()
+                services.nextTest()
 
-                if (TestManager.isTestingComplete()) {
+                if (services.isTestingComplete()) {
+                    services.exportSubject()
                     goToHomeScreen()
-                } else if (TestManager.getCurrentRepetition() === 1) {
+                } else if (services.getCurrentRepetition() === 1) {
                     goToConfiguration()
                 } else {
                     goToInstructions()
@@ -134,7 +137,7 @@ Item {
         id: repetitionLabel
         height: 30
         visible: true
-        text: "Repetition #" + TestManager.getCurrentRepetition()
+        text: "Repetition #" + services.getCurrentRepetition()
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top

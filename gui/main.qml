@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import "scripts/TestManager.js" as TestManager
 
 Window {
     id: window
@@ -42,9 +41,12 @@ Window {
 
     Connections {
         target: stackView.currentItem
-        onGoToHomeScreen: stackView.push("screens/HomeScreen.qml")
-        onGoToConfiguration: stackView.push("screens/ConfigurationScreen.qml")
-        onGoToInstructions: stackView.push("screens/InstructionScreen.qml")
-        onGoToTest: stackView.push("screens/TestScreen.qml")
+        function onGoToHomeScreen() { stackView.push("screens/HomeScreen.qml") }
+        function onGoToConfiguration() { 
+            stackView.push("screens/ConfigurationScreen.qml")
+            services.goToTestingHeight()
+        }
+        function onGoToInstructions() { stackView.push("screens/InstructionScreen.qml") }
+        function onGoToTest() { stackView.push("screens/TestScreen.qml", StackView.Immediate) }
     }
 }

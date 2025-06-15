@@ -6,9 +6,12 @@ Item {
     width: 1280
     height: 720
     visible: true
-    anchors.fill: parent
+    anchors.fill: stackView.view
 
+    signal goToTest()
+    signal goToHomeScreen()
     signal goToInstructions()
+    signal goToConfiguration()
 
     // Title
     Label {
@@ -71,7 +74,7 @@ Item {
             id: upMouseArea
             anchors.fill: parent
             onClicked: {
-                console.log("Up arrow clicked! Raise setpoint by 1 inch!")
+                services.bumpArmUp()
             }
         }
     }
@@ -92,7 +95,7 @@ Item {
             id: downMouseArea
             anchors.fill: parent
             onClicked: {
-                console.log("Down arrow clicked! Lower setpoint by 1 inch!")
+                services.bumpArmDown()
             }
         }
     }

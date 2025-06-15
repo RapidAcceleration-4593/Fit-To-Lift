@@ -6,8 +6,11 @@ Item {
     width: 1280
     height: 720
     visible: true
-    anchors.fill: parent
+    anchors.fill: stackView.view
 
+    signal goToTest()
+    signal goToHomeScreen()
+    signal goToInstructions()
     signal goToConfiguration()
 
     // Title Label
@@ -80,7 +83,7 @@ Item {
     // Height Input TextField
     TextField {
         id: heightField
-        placeholderText: "Height"
+        placeholderText: "Height (inches)"
         height: 75
         anchors {
             left: parent.left
@@ -121,7 +124,11 @@ Item {
             pointSize: 22
         }
         enabled: nameField.text.length > 0 && isHeightValid(heightField.text)
-        onClicked: goToConfiguration()
+        onClicked: {
+            services.setSubjectName(nameField.text)
+            services.setSubjectHeight(parseInt(heightField.text))
+            goToConfiguration()
+        }
     }
 
     function isHeightValid(text) {

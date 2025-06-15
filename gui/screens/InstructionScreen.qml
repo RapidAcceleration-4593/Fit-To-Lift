@@ -1,19 +1,21 @@
 import QtQuick
 import QtQuick.Controls
-import "../scripts/TestManager.js" as TestManager
 
 Item {
     id: instructionScreen
     width: 1280
     height: 720
     visible: true
-    anchors.fill: parent
+    anchors.fill: stackView.view
 
-    property string testName: TestManager.getCurrentTest().name
-    property string instructionsText: TestManager.getCurrentTest().instructions
+    property string testName: services.getCurrentTestName()
+    property string instructionsText: services.getCurrentTestInstructions()
 
     signal goToTest()
-
+    signal goToHomeScreen()
+    signal goToInstructions()
+    signal goToConfiguration()
+    
     // Title
     Label {
         id: titleLabel
@@ -63,7 +65,7 @@ Item {
         id: repetitionLabel
         height: 30
         visible: true
-        text: "Repetition #" + TestManager.getCurrentRepetition()
+        text: "Repetition #" + services.getCurrentRepetition()
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
