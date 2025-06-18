@@ -68,11 +68,12 @@ Item {
         anchors.leftMargin: 450
         anchors.rightMargin: 700
         anchors.topMargin: 330
-        source: "../images/arrows.png"
+        source: "../images/arrow.png"
 
         MouseArea {
             id: upMouseArea
             anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
             onClicked: {
                 services.bumpArmUp()
             }
@@ -88,12 +89,13 @@ Item {
         anchors.leftMargin: 700
         anchors.rightMargin: 450
         anchors.topMargin: 330
-        source: "../images/arrows.png"
+        source: "../images/arrow.png"
         rotation: 180
 
         MouseArea {
             id: downMouseArea
             anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
             onClicked: {
                 services.bumpArmDown()
             }

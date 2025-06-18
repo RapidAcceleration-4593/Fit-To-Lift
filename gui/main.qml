@@ -27,9 +27,8 @@ Window {
         height: 25
         color: "#cdcdcd"
         anchors {
-            left: parent.left
+            horizontalCenter: parent.horizontalCenter
             bottom: parent.bottom
-            leftMargin: 8
             bottomMargin: 8
         }
         font {

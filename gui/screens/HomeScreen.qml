@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import "../components"
 
 Item {
     id: homeScreen
@@ -60,8 +61,15 @@ Item {
     // Name Input TextField
     TextField {
         id: nameField
-        placeholderText: "Full Name"
         height: 75
+        placeholderText: "Full Name"
+        onFocusChanged: {
+            if (focus) {
+                keyboard.visible = true
+                keypad.visible = false
+                keyboard.targetField = nameField
+            }
+        }
         anchors {
             left: parent.left
             right: parent.right
@@ -83,8 +91,15 @@ Item {
     // Height Input TextField
     TextField {
         id: heightField
-        placeholderText: "Height (inches)"
         height: 75
+        placeholderText: "Height (inches)"
+        onFocusChanged: {
+            if (focus) {
+                keypad.visible = true
+                keyboard.visible = false
+                keypad.targetField = heightField
+            }
+        }
         anchors {
             left: parent.left
             right: parent.right
@@ -133,5 +148,13 @@ Item {
 
     function isHeightValid(text) {
         return text.length === 2 && /^[0-9]+$/.test(text)
+    }
+
+    CustomKeyboard {
+        id: keyboard
+    }
+
+    CustomKeypad {
+        id: keypad
     }
 }

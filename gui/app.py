@@ -10,9 +10,6 @@ if __name__ == '__main__':
     config_path = os.path.join(os.path.dirname(__file__), "qtquickcontrols2.conf")
     os.environ["QT_QUICK_CONTROLS_CONF"] = config_path
     app = QApplication(sys.argv)
-
-    
-
     engine = QQmlApplicationEngine()
 
     services = service.Services()
