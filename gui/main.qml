@@ -8,15 +8,12 @@ Window {
     height: 720
     title: "Fit To Lift"
 
-    Rectangle {
-        id: background
+    StackView {
+        id: stackView
         anchors.fill: parent
-        color: "#1e1e1e"
-
-        StackView {
-            id: stackView
-            anchors.fill: parent
-            initialItem: "screens/HomeScreen.qml"
+        initialItem: "screens/HomeScreen.qml"
+        background: Rectangle {
+            color: "#1e1e1e"
         }
     }
 

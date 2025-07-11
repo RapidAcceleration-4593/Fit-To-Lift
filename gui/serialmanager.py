@@ -51,7 +51,7 @@ class SerialManager():
 
 def default_port_name():
     if platform.system() == "Windows":
-        return "COM1"
+        return "COM4"
     elif platform.system() == "Linux":
         return "/dev/tty/USB0"
     elif platform.system() == "Darwin": # Mac

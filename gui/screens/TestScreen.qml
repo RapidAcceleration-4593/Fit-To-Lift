@@ -6,7 +6,7 @@ Item {
     width: 1280
     height: 720
     visible: true
-    anchors.fill: stackView.view
+    anchors.fill: stackView
 
     property string testName: services.getCurrentTestName()
     property string instructionsText: services.getCurrentTestInstructions()

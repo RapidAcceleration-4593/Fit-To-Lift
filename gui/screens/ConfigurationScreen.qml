@@ -6,7 +6,7 @@ Item {
     width: 1280
     height: 720
     visible: true
-    anchors.fill: stackView.view
+    anchors.fill: stackView
 
     signal goToTest()
     signal goToHomeScreen()

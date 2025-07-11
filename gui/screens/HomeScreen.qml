@@ -7,7 +7,7 @@ Item {
     width: 1280
     height: 720
     visible: true
-    anchors.fill: stackView.view
+    anchors.fill: stackView
 
     signal goToTest()
     signal goToHomeScreen()
@@ -35,7 +35,7 @@ Item {
             pointSize: 56
         }
     }
-
+    
     // Instructions Label
     Label {
         id: instructionsLabel
@@ -61,6 +61,7 @@ Item {
     // Name Input TextField
     TextField {
         id: nameField
+        width: 680
         height: 75
         placeholderText: "Full Name"
         onFocusChanged: {
@@ -71,11 +72,8 @@ Item {
             }
         }
         anchors {
-            left: parent.left
-            right: parent.right
+            horizontalCenter: parent.horizontalCenter
             top: parent.top
-            leftMargin: 300
-            rightMargin: 300
             topMargin: 310
         }
         horizontalAlignment: Text.AlignHCenter
@@ -91,6 +89,7 @@ Item {
     // Height Input TextField
     TextField {
         id: heightField
+        width: 380
         height: 75
         placeholderText: "Height (inches)"
         onFocusChanged: {
@@ -101,11 +100,8 @@ Item {
             }
         }
         anchors {
-            left: parent.left
-            right: parent.right
+            horizontalCenter: parent.horizontalCenter
             top: parent.top
-            leftMargin: 450
-            rightMargin: 450
             topMargin: 410
         }
         horizontalAlignment: Text.AlignHCenter
@@ -124,13 +120,11 @@ Item {
     Button {
         id: submitButton
         text: "Submit"
+        width: 250
         height: 75
         anchors {
-            left: parent.left
-            right: parent.right
+            horizontalCenter: parent.horizontalCenter
             top: parent.top
-            leftMargin: 500
-            rightMargin: 500
             topMargin: 515
         }
         font {
