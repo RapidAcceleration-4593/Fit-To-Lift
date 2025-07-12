@@ -8,7 +8,7 @@ Item {
     property var targetField
 
     width: parent.width
-    height: 280
+    height: 220
     anchors.bottom: parent.bottom
     z: 100
 
@@ -17,55 +17,88 @@ Item {
         color: "#222"
     }
 
-    GridLayout {
-        id: keyGrid
-        width: parent.width
-        height: parent.height - 40
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        columns: 10
-        rowSpacing: 3
-        columnSpacing: 5
+    property int keyWidth: 110
+    property int keyLargeWidth: 240
+    property int keyHeight: 50
+
+    ColumnLayout {
+        anchors.fill: parent
         anchors.margins: 10
+        spacing: 1
+        Layout.alignment: Qt.AlignHCenter
 
-        property var keys: [
-            "Q","W","E","R","T","Y","U","I","O","P",
-            "A","S","D","F","G","H","J","K","L","←",
-            "Z","X","C","V","B","N","M","Space","Enter"
-        ]
-
-        Repeater {
-            model: keyGrid.keys.length
-            delegate: Button {
-                text: keyGrid.keys[index]
-                Layout.preferredWidth: keyGrid.width / 10 - 8
-                Layout.preferredHeight: 60
-                font {
-                    family: "Space Mono"
-                    pointSize: 18
+        /* --- Row 1 --- */
+        RowLayout {
+            spacing: 6
+            Layout.alignment: Qt.AlignHCenter
+            Repeater {
+                model: ["Q","W","E","R","T","Y","U","I","O","P"]
+                delegate: KeyButton {
+                    text: modelData.toUpperCase()
+                    targetField: keyboard.targetField
+                    keyboardRef: keyboard
+                    Layout.preferredWidth: keyboard.keyWidth
+                    Layout.preferredHeight: keyboard.keyHeight
                 }
-                onClicked: {
-                    if (!keyboard.targetField) return
-                    keyboard.targetField.forceActiveFocus()
+            }
+        }
 
-                    if (text === "←") {
-                        let pos = keyboard.targetField.cursorPosition
-                        if (pos > 0) {
-                            let currentText = keyboard.targetField.text
-                            keyboard.targetField.text = currentText.slice(0, pos - 1) + currentText.slice(pos)
-                            keyboard.targetField.cursorPosition = pos - 1
-                        }
-                    } else if (text === "Space") {
-                        keyboard.targetField.insert(keyboard.targetField.cursorPosition, " ")
-                        keyboard.targetField.cursorPosition += 1
-                    } else if (text === "Enter") {
-                        keyboard.visible = false
-                    } else {
-                        keyboard.targetField.insert(keyboard.targetField.cursorPosition, text)
-                        keyboard.targetField.cursorPosition += text.length
-                    }
+        /* --- Row 2 --- */
+        RowLayout {
+            spacing: 6
+            Layout.alignment: Qt.AlignHCenter
+            Repeater {
+                model: ["A","S","D","F","G","H","J","K","L"]
+                delegate: KeyButton {
+                    text: modelData.toUpperCase()
+                    targetField: keyboard.targetField
+                    keyboardRef: keyboard
+                    Layout.preferredWidth: keyboard.keyWidth
+                    Layout.preferredHeight: keyboard.keyHeight
                 }
+            }
+        }
+
+        /* --- Row 3 --- */
+        RowLayout {
+            spacing: 6
+            Layout.alignment: Qt.AlignHCenter
+            Repeater {
+                model: ["Z","X","C","V","B","N","M"]
+                delegate: KeyButton {
+                    text: modelData.toUpperCase()
+                    targetField: keyboard.targetField
+                    keyboardRef: keyboard
+                    Layout.preferredWidth: keyboard.keyWidth
+                    Layout.preferredHeight: keyboard.keyHeight
+                }
+            }
+        }
+
+        /* --- Row 4 --- */
+        RowLayout {
+            spacing: 6
+            Layout.alignment: Qt.AlignHCenter
+            KeyButton {
+                text: "Back"
+                targetField: keyboard.targetField
+                keyboardRef: keyboard
+                Layout.preferredWidth: keyboard.keyLargeWidth
+                Layout.preferredHeight: keyboard.keyHeight
+            }
+            KeyButton {
+                text: "Space"
+                targetField: keyboard.targetField
+                keyboardRef: keyboard
+                Layout.preferredWidth: keyboard.keyLargeWidth
+                Layout.preferredHeight: keyboard.keyHeight
+            }
+            KeyButton {
+                text: "Enter"
+                targetField: keyboard.targetField
+                keyboardRef: keyboard
+                Layout.preferredWidth: keyboard.keyLargeWidth
+                Layout.preferredHeight: keyboard.keyHeight
             }
         }
     }

@@ -1,7 +1,7 @@
 import sys
 import os
 from PySide6.QtWidgets import QApplication 
-from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
+from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtCore import QUrl
 import PySide6.QtAsyncio as QtAsyncio
 import service
@@ -21,3 +21,4 @@ if __name__ == '__main__':
     if not engine.rootObjects():
         sys.exit(-1)
     QtAsyncio.run(handle_sigint=True)
+    # sys.exit(app.exec())

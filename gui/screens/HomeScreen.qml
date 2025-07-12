@@ -146,9 +146,15 @@ Item {
 
     CustomKeyboard {
         id: keyboard
+        onVisibleChanged: updateKeyboardVisible()
     }
 
     CustomKeypad {
         id: keypad
+        onVisibleChanged: updateKeyboardVisible()
+    }
+
+    function updateKeyboardVisible() {
+        window.keyboardVisible = keyboard.visible || keypad.visible
     }
 }

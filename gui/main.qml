@@ -8,6 +8,8 @@ Window {
     height: 720
     title: "Fit To Lift"
 
+    property bool keyboardVisible: false
+
     StackView {
         id: stackView
         anchors.fill: parent
@@ -33,6 +35,7 @@ Window {
             styleName: "Regular"
             pointSize: 14
         }
+        visible: !window.keyboardVisible
     }
 
     Connections {
