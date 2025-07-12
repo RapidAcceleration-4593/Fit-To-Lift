@@ -1,6 +1,5 @@
 from PySide6.QtCore import QObject, Slot
 import asyncio
-import serialmanager
 import datamanager
 import testmanager
 from asynchelper import create_task
@@ -11,10 +10,17 @@ class Services(QObject):
 
         All its methods with the @Slot() annotation are in camelCase, in order to match QML's style.
     """
-    def __init__(self):
-        QObject.__init__(self)
+    def __init__(self, mock=False):
+        super().__init__()
         self.measuring = False
-        self.serial_manager = serialmanager.get_default_manager()
+
+        if mock:
+            from mockserial import MockSerialManager
+            self.serial_manager = MockSerialManager()
+        else:
+            import serialmanager
+            self.serial_manager = serialmanager.get_default_manager()
+
         self.test_manager = testmanager.TestManager()
         self.subject = datamanager.Person()
 

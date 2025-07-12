@@ -23,8 +23,6 @@ Item {
             left: parent.left
             right: parent.right
             top: parent.top
-            leftMargin: 0
-            rightMargin: 0
             topMargin: 75
         }
         horizontalAlignment: Text.AlignHCenter
@@ -45,8 +43,6 @@ Item {
             left: parent.left
             right: parent.right
             top: parent.top
-            leftMargin: 0
-            rightMargin: 0
             topMargin: 240
         }
         horizontalAlignment: Text.AlignHCenter

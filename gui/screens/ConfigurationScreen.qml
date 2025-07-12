@@ -23,8 +23,6 @@ Item {
             left: parent.left
             right: parent.right
             top: parent.top
-            leftMargin: 0
-            rightMargin: 0
             topMargin: 75
         }
         horizontalAlignment: Text.AlignHCenter
@@ -61,6 +59,10 @@ Item {
 
     Image {
         id: upArrowImage
+        property url defaultSource: "../images/arrow.png"
+        property url pressedSource: "../images/arrow_filled.png"
+
+        source: defaultSource
         height: 130
         anchors.left: parent.left
         anchors.right: parent.right
@@ -68,13 +70,20 @@ Item {
         anchors.leftMargin: 450
         anchors.rightMargin: 700
         anchors.topMargin: 330
-        source: "../images/arrow.png"
+
+        Timer {
+            id: upTimer
+            interval: 350
+            repeat: false
+            onTriggered: parent.source = parent.defaultSource
+        }
 
         MouseArea {
-            id: upMouseArea
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: {
+                parent.source = parent.pressedSource
+                upTimer.start()
                 services.bumpArmUp()
             }
         }
@@ -82,6 +91,10 @@ Item {
 
     Image {
         id: downArrowImage
+        property url defaultSource: "../images/arrow.png"
+        property url pressedSource: "../images/arrow_filled.png"
+
+        source: defaultSource
         height: 130
         anchors.left: parent.left
         anchors.right: parent.right
@@ -89,14 +102,21 @@ Item {
         anchors.leftMargin: 700
         anchors.rightMargin: 450
         anchors.topMargin: 330
-        source: "../images/arrow.png"
         rotation: 180
 
+        Timer {
+            id: downTimer
+            interval: 350
+            repeat: false
+            onTriggered: parent.source = parent.defaultSource
+        }
+
         MouseArea {
-            id: downMouseArea
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: {
+                parent.source = parent.pressedSource
+                downTimer.start()
                 services.bumpArmDown()
             }
         }
