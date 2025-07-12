@@ -59,8 +59,8 @@ Item {
 
     Image {
         id: upArrowImage
-        property url defaultSource: "../images/arrow.png"
-        property url pressedSource: "../images/arrow_filled.png"
+        property url defaultSource: "../resources/arrow.png"
+        property url pressedSource: "../resources/arrow_filled.png"
 
         source: defaultSource
         height: 130
@@ -91,8 +91,8 @@ Item {
 
     Image {
         id: downArrowImage
-        property url defaultSource: "../images/arrow.png"
-        property url pressedSource: "../images/arrow_filled.png"
+        property url defaultSource: "../resources/arrow.png"
+        property url pressedSource: "../resources/arrow_filled.png"
 
         source: defaultSource
         height: 130
