@@ -56,8 +56,3 @@ def default_port_name():
         return "/dev/tty/USB0"
     elif platform.system() == "Darwin": # Mac
         return "no/effing/clue"
-
-_default_serial = SerialManager(Serial(port=default_port_name(), baudrate=115200))
-
-def get_default_manager() -> SerialManager:
-    return _default_serial 

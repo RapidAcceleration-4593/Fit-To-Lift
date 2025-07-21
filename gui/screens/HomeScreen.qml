@@ -4,10 +4,7 @@ import "../components"
 
 Item {
     id: homeScreen
-    width: 1280
-    height: 720
     visible: true
-    anchors.fill: stackView
 
     signal goToTest()
     signal goToHomeScreen()

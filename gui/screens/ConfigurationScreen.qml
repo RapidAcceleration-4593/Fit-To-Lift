@@ -3,10 +3,7 @@ import QtQuick.Controls
 
 Item {
     id: configurationScreen
-    width: 1280
-    height: 720
     visible: true
-    anchors.fill: stackView
 
     signal goToTest()
     signal goToHomeScreen()
@@ -61,19 +58,18 @@ Item {
         id: upArrowImage
         property url defaultSource: "../resources/arrow.png"
         property url pressedSource: "../resources/arrow_filled.png"
-
         source: defaultSource
-        height: 130
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.leftMargin: 450
-        anchors.rightMargin: 700
-        anchors.topMargin: 330
+        width: 140
+        height: 140
+        anchors {
+            top: parent.top
+            topMargin: 330
+        }
+        x: parent.width / 2 - width / 2 - 120
 
         Timer {
             id: upTimer
-            interval: 350
+            interval: 150
             repeat: false
             onTriggered: parent.source = parent.defaultSource
         }
@@ -93,20 +89,19 @@ Item {
         id: downArrowImage
         property url defaultSource: "../resources/arrow.png"
         property url pressedSource: "../resources/arrow_filled.png"
-
         source: defaultSource
-        height: 130
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.leftMargin: 700
-        anchors.rightMargin: 450
-        anchors.topMargin: 330
+        width: 140
+        height: 140
+        anchors {
+            top: parent.top
+            topMargin: 330
+        }
+        x: parent.width / 2 - width / 2 + 120
         rotation: 180
 
         Timer {
             id: downTimer
-            interval: 350
+            interval: 150
             repeat: false
             onTriggered: parent.source = parent.defaultSource
         }
@@ -126,13 +121,11 @@ Item {
     Button {
         id: beginButton
         text: "Done"
+        width: 280
         height: 75
         anchors {
-            left: parent.left
-            right: parent.right
             top: parent.top
-            leftMargin: 500
-            rightMargin: 500
+            horizontalCenter: parent.horizontalCenter
             topMargin: 515
         }
         font {

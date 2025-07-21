@@ -1,8 +1,9 @@
 from PySide6.QtCore import QObject, Slot
 import asyncio
 import serialmanager
-import datamanager
+import personaldata
 import testmanager
+from printing import PersonPrinter
 from asynchelper import create_task
 
 class Services(QObject):
@@ -10,12 +11,13 @@ class Services(QObject):
 
         All its methods with the @Slot() annotation are in camelCase, in order to match QML's style.
     """
-    def __init__(self):
+    def __init__(self, serial_manager: serialmanager.SerialManager, test_manager: testmanager.TestManager, printer: PersonPrinter):
         QObject.__init__(self)
         self.measuring = False
-        self.serial_manager = serialmanager.get_default_manager()
-        self.test_manager = testmanager.TestManager()
-        self.subject = datamanager.Person()
+        self.serial_manager = serial_manager
+        self.test_manager = test_manager
+        self.printer = printer
+        self.subject = personaldata.Person()
 
     # Device functionality
 
@@ -45,7 +47,7 @@ class Services(QObject):
 
         create_task(
             self.run_measurement(timeout),
-            callback = lambda future : self.subject.addMeasurement(current_lift, future.result())
+            callback = lambda future : self.subject.add_measurement(current_lift, future.result())
         )
 
     @Slot()
@@ -124,5 +126,5 @@ class Services(QObject):
             await asyncio.sleep(0.01)
         await asyncio.sleep(0.1) # Magic wait to ensure all data is written to self.subject
 
-        print(self.subject.printout())
-        self.subject = datamanager.Person()
+        self.printer.print(self.subject)
+        self.subject = personaldata.Person()
