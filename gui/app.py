@@ -9,10 +9,10 @@ import PySide6.QtAsyncio as QtAsyncio
 
 import service
 import serial
+from serial.tools import list_ports
 import testmanager
 import serialmanager
 import printing
-
 
 if __name__ == '__main__':
     config_path = os.path.join(os.path.dirname(__file__), "qtquickcontrols2.conf")
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
-    serial_connection = serial.Serial(serialmanager.default_port_name(), 115200)
+    serial_connection = serialmanager.create_serial_connection()
     serial_manager = serialmanager.SerialManager(serial_connection)
     test_manager = testmanager.TestManager(reps_per_test=1)
 

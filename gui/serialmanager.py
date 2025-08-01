@@ -1,4 +1,5 @@
 from serial import Serial
+from serial.tools import list_ports
 import platform
 
 import asyncio
@@ -49,10 +50,12 @@ class SerialManager():
         async with self.ser_mutex:
             await asyncio.to_thread(self.ser.write, message.encode() + b"\n")
 
-def default_port_name():
-    if platform.system() == "Windows":
-        return "COM4"
-    elif platform.system() == "Linux":
-        return "/dev/tty/USB0"
-    elif platform.system() == "Darwin": # Mac
-        return "no/effing/clue"
+def create_serial_connection():
+    ports = list_ports.comports()
+    arduino_name = ""
+    for port in ports:
+        if port.vid in (9025, 6790):
+            arduino_name = port.name
+    if arduino_name == "":
+        raise Exception("Arduino not connected!")
+    return Serial(arduino_name, 115200)
