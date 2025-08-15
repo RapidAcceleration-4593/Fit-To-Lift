@@ -1,6 +1,6 @@
 #include <Encoder.h>
-#include <io.h>
-#include <iom328p.h> // Included for intellisense purposes
+#include <avr/io.h>
+// #include <iom328p.h> // Included for intellisense purposes
 
 // Pin connections
 #define LOAD_CELL A1
@@ -20,7 +20,7 @@
 #define CMD_SEP '\n' // The character that separates commands from each other
 #define SEPARATOR ' ' // The character that separates expressions within the same command
 
-Encoder encoder(4, 5);
+Encoder encoder(2, 4);
 
 bool emergencyStopped = false;
 
@@ -178,19 +178,21 @@ void executeCommand(String command, String payload) {
     bumpMotorDown();
   } else if (command == SETPOINT_CMD) {
     double newSetpoint = payload.toDouble();
-    setSetpoint(newSetpoint);
+    setSetpointInches(newSetpoint);
   } else if (command == READ_CELL_CMD) {
     printLoadCellReading();
   } else if (command == STATUS_CMD) {
     printStatus();
   } else if (command == E_STOP_CMD) {
     emergencyStop();
+  } else if (command == "re") {
+    encoder.readAndReset();
   }
 }
 
-bool setSetpoint(double set) {
+bool setSetpointInches(double set) {
   goingToSetpoint = true;
-  setpoint = set;
+  setpoint = inchesToCounts(set);
 }
 
 void handleSetpointMovement() {
@@ -207,11 +209,11 @@ void handleSetpointMovement() {
 }
 
 void bumpMotorUp() {
-  setSetpoint(encoder.read() + 1200);
+  setSetpointInches(countsToInches(encoder.read()) + 1);
 }
 
 void bumpMotorDown() {
-  setSetpoint(encoder.read() - 1200);
+  setSetpointInches(countsToInches(encoder.read()) - 1);
 }
 
 void magnetEngage() {
@@ -254,6 +256,14 @@ void printStatus() {
   Serial.println();
 }
 
+float inchesToCounts(float inches) {
+  return (inches - 5.0732) / 0.0008465; // Needs fine tuning
+}
+
+float countsToInches(float counts) {
+  return counts * 0.0008465 + 5.0732;
+}
+
 void printLoadCellReading() {
   Serial.println(readLoadCellLbs());
 }
@@ -265,6 +275,6 @@ double readLoadCellLbs() {
 void emergencyStop() {
   emergencyStopped = true;
   goingToSetpoint = false;
-  magnetEngage();
   stopMotor();
+  magnetDisengage();
 }
