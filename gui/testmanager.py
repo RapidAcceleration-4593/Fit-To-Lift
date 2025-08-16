@@ -7,7 +7,7 @@ def _proportional_generator(proportion):
     return lambda height : height * proportion
 
 _tests: list[dict[str, Any]] = [
-    { "setpoint-calculator" : _absolute_generator(3), "name" : "Floor-Level Lift", "instructions" : "Squat down, grip the bar with both hands, and lift straight up using your legs. Keep your back straight." },
+    { "setpoint-calculator" : _absolute_generator(6), "name" : "Floor-Level Lift", "instructions" : "Squat down, grip the bar with both hands, and lift straight up using your legs. Keep your back straight." },
     { "setpoint-calculator" : _absolute_generator(15), "name" : "Knee-Level Lift", "instructions" : "Bend slightly, grip the bar just below your knees, and stand up tall, driving through your legs." },
     { "setpoint-calculator" : _proportional_generator(.5), "name" : "Waist-Level Lift", "instructions" : "Stand close, grip the bar at waist height, and lift it straight up to your chest. Keep elbows in." },
     { "setpoint-calculator" : _absolute_generator(60), "name" : "Shoulder-Level, Arms In", "instructions" : "Grip the bar at shoulder height with elbows tucked in. Push straight up above your head." },
