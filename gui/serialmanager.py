@@ -58,4 +58,6 @@ def create_serial_connection():
             arduino_name = port.name
     if arduino_name == "":
         raise Exception("Arduino not connected!")
+    if arduino_name[0:2] == "tty":
+        arduino_name = "/dev/" + arduino_name
     return Serial(arduino_name, 115200)
