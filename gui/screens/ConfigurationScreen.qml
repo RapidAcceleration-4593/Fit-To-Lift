@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import "../themes"
 
 Item {
     id: configurationScreen
@@ -10,60 +11,48 @@ Item {
     signal goToInstructions()
     signal goToConfiguration()
 
-    // Title
+    // Title Label
     Label {
-        id: titleLabel
         text: "Configuration"
         height: 100
-        color: "#ffffff"
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            topMargin: 75
+            top: parent.top; topMargin: 75
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font {
-            family: "Space Mono"
-            pointSize: 56
-            styleName: "Bold"
+            family: Theme.fontFamily
+            pointSize: Theme.titleFontSize
+            bold: true
         }
     }
 
-    // Instructions
+    // Instructions Label
     Label {
-        id: instructionsLabel
         text: "Please finalize height adjustments, if necessary."
         height: 30
-        color: "#ffffff"
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            leftMargin: 150
-            rightMargin: 150
-            topMargin: 240
+            top: parent.top; topMargin: 240
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        wrapMode: Text.WordWrap
         font {
-            family: "Space Mono"
-            pointSize: 20
+            family: Theme.fontFamily
+            pointSize: Theme.headerFontSize
         }
     }
 
+    // Up Arrow
     Image {
         id: upArrowImage
         property url defaultSource: "../resources/arrow.png"
         property url pressedSource: "../resources/arrow_filled.png"
         source: defaultSource
-        width: 140
-        height: 140
+        width: 140; height: 140
         anchors {
-            top: parent.top
-            topMargin: 330
+            top: parent.top; topMargin: 330
         }
         x: parent.width / 2 - width / 2 - 120
 
@@ -85,16 +74,15 @@ Item {
         }
     }
 
+    // Down Arrow
     Image {
         id: downArrowImage
         property url defaultSource: "../resources/arrow.png"
         property url pressedSource: "../resources/arrow_filled.png"
         source: defaultSource
-        width: 140
-        height: 140
+        width: 140; height: 140
         anchors {
-            top: parent.top
-            topMargin: 330
+            top: parent.top; topMargin: 330
         }
         x: parent.width / 2 - width / 2 + 120
         rotation: 180
@@ -119,20 +107,16 @@ Item {
 
     // Done button
     Button {
-        id: beginButton
         text: "Done"
-        width: 280
-        height: 75
+        width: 250; height: 75
         anchors {
-            top: parent.top
+            top: parent.top; topMargin: 515
             horizontalCenter: parent.horizontalCenter
-            topMargin: 515
         }
         font {
-            family: "Space Mono"
-            pointSize: 22
+            family: Theme.fontFamily
+            pointSize: Theme.buttonFontSize
             bold: true
-            letterSpacing: 2
         }
         onClicked: {
             goToInstructions()

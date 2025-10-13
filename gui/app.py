@@ -1,5 +1,4 @@
-import sys
-import os
+import sys, os
 
 from PySide6.QtWidgets import QApplication 
 from PySide6.QtQml import QQmlApplicationEngine
@@ -8,22 +7,22 @@ from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
 import PySide6.QtAsyncio as QtAsyncio
 
 import service
-import serial
-from serial.tools import list_ports
-import testmanager
 import serialmanager
+import testmanager
 import printing
 
-if __name__ == '__main__':
-    config_path = os.path.join(os.path.dirname(__file__), "qtquickcontrols2.conf")
-    os.environ["QT_QUICK_CONTROLS_CONF"] = config_path
+MOCK_SERIAL = True
+NUM_REPETITIONS = 1
+
+def main():
+    os.environ["QT_QUICK_CONTROLS_CONF"] = os.path.join(os.path.dirname(__file__), "themes/qtquickcontrols2.conf")
 
     app = QApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
-    serial_connection = serialmanager.create_serial_connection()
+    serial_connection = serialmanager.create_serial_connection(mock = MOCK_SERIAL)
     serial_manager = serialmanager.SerialManager(serial_connection)
-    test_manager = testmanager.TestManager(reps_per_test=1)
+    test_manager = testmanager.TestManager(reps_per_test = NUM_REPETITIONS)
 
     printer = QPrinter(QPrinterInfo.defaultPrinter())
     person_printer = printing.WidePagePrinter(printer)
@@ -36,8 +35,11 @@ if __name__ == '__main__':
     if not engine.rootObjects():
         serial_connection.close()
         sys.exit(-1)
-    QtAsyncio.run(handle_sigint=True)
-    serial_connection.close()
+    
+    try:
+        QtAsyncio.run(handle_sigint = True)
+    finally:
+        serial_connection.close()
 
-    # Alternative Qt-only loop
-    # sys.exit(app.exec())
+if __name__ == '__main__':
+    main()

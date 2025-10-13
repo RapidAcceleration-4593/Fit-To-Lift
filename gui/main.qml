@@ -1,11 +1,11 @@
 import QtQuick
 import QtQuick.Controls
+import "themes"
 
 Window {
     id: window
     visible: true
-    width: 1280
-    height: 720
+    width: 1280; height: 720
     title: "Fit To Lift"
 
     property bool keyboardVisible: false
@@ -14,27 +14,19 @@ Window {
         id: stackView
         anchors.fill: parent
         initialItem: "screens/HomeScreen.qml"
-        background: Rectangle {
-            color: "#1e1e1e"
-        }
+        background: Rectangle { color: "#1E1E1E" }
     }
 
     // Watermark
     Label {
-        id: watermarkLabel
         text: "Designed & Manufactured by Rapid Acceleration"
-        height: 25
-        color: "#cdcdcd"
         anchors {
+            bottom: parent.bottom; bottomMargin: 8
             horizontalCenter: parent.horizontalCenter
-            bottom: parent.bottom
-            bottomMargin: 8
         }
-        font {
-            family: "Space Mono"
-            styleName: "Regular"
-            pointSize: 14
-        }
+        font.family: Theme.fontFamily
+        font.pointSize: 12
+        opacity: 0.6
         visible: !window.keyboardVisible
     }
 

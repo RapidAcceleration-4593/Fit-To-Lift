@@ -7,8 +7,7 @@ Item {
     visible: false
     property var targetField
 
-    width: parent.width
-    height: 220
+    width: parent.width; height: 220
     anchors.bottom: parent.bottom
     z: 100
 

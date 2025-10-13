@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import "../components"
+import "../themes"
 
 Item {
     id: homeScreen
@@ -13,50 +14,54 @@ Item {
 
     // Title Label
     Label {
-        id: titleLabel
         text: "Fit To Lift"
         height: 100
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            topMargin: 75
+            top: parent.top; topMargin: 75
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font {
+            family: Theme.fontFamily
+            pointSize: Theme.titleFontSize
             bold: true
-            family: "Space Mono"
-            pointSize: 56
         }
     }
     
     // Instructions Label
     Label {
-        id: instructionsLabel
-        text: "Please enter the user's name and height, in inches, below:"
+        text: "Please provide the client's name and height, in inches, below:"
         height: 30
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            topMargin: 240
+            top: parent.top; topMargin: 240
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font {
-            bold: true
-            family: "Space Mono"
-            pointSize: 20
+            family: Theme.fontFamily
+            pointSize: Theme.headerFontSize
         }
     }
 
-    // Name Input TextField
+    // Name Input
     TextField {
         id: nameField
-        width: 680
-        height: 75
         placeholderText: "Full Name"
+        width: 680; height: 75
+        anchors {
+            top: parent.top; topMargin: 310
+            horizontalCenter: parent.horizontalCenter
+        }
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        font {
+            family: Theme.fontFamily
+            pointSize: Theme.inputFontSize
+        }
+        selectionColor: "#FFFFFF"
+        cursorVisible: true
         onFocusChanged: {
             if (focus) {
                 keyboard.visible = true
@@ -64,27 +69,25 @@ Item {
                 keyboard.targetField = nameField
             }
         }
+    }
+
+    // Height Input
+    TextField {
+        id: heightField
+        placeholderText: "Height"
+        width: 380; height: 75
         anchors {
+            top: parent.top; topMargin: 410
             horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: 310
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font {
-            family: "Space Mono"
-            pointSize: 24
+            family: Theme.fontFamily
+            pointSize: Theme.inputFontSize
         }
-        selectionColor: "#ffffff"
+        selectionColor: "#FFFFFF"
         cursorVisible: true
-    }
-
-    // Height Input TextField
-    TextField {
-        id: heightField
-        width: 380
-        height: 75
-        placeholderText: "Height (inches)"
         onFocusChanged: {
             if (focus) {
                 keypad.visible = true
@@ -92,62 +95,33 @@ Item {
                 keypad.targetField = heightField
             }
         }
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: 410
-        }
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.strikeout: false
-        font {
-            family: "Space Mono"
-            pointSize: 24
-        }
-        selectionColor: "#ffffff"
-        cursorVisible: true
-
     }
 
     // Submit Button
     Button {
-        id: submitButton
+        id: submitButon
         text: "Submit"
-        width: 250
-        height: 75
+        width: 250; height: 75
         anchors {
+            top: parent.top; topMargin: 515
             horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: 515
         }
         font {
+            family: Theme.fontFamily
+            pointSize: Theme.buttonFontSize
             bold: true
-            family: "Space Mono"
-            pointSize: 22
         }
         enabled: nameField.text.length > 0 && isHeightValid(heightField.text)
         onClicked: {
             services.setSubjectName(nameField.text)
             services.setSubjectHeight(parseInt(heightField.text))
-            goToConfiguration()
+            goToInstructions()
         }
     }
 
-    function isHeightValid(text) {
-        return text.length === 2 && /^[0-9]+$/.test(text)
-    }
+    CustomKeyboard { id: keyboard; onVisibleChanged: updateKeyboardVisible() }
+    CustomKeypad { id: keypad; onVisibleChanged: updateKeyboardVisible() }
 
-    CustomKeyboard {
-        id: keyboard
-        onVisibleChanged: updateKeyboardVisible()
-    }
-
-    CustomKeypad {
-        id: keypad
-        onVisibleChanged: updateKeyboardVisible()
-    }
-
-    function updateKeyboardVisible() {
-        window.keyboardVisible = keyboard.visible || keypad.visible
-    }
+    function isHeightValid(text) { var height = parseInt(text); return /^[0-9]+$/.test(text) && height >= 48 && height <= 84 }
+    function updateKeyboardVisible() { window.keyboardVisible = keyboard.visible || keypad.visible }
 }

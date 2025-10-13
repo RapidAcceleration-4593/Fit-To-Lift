@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import "../themes"
 
 Item {
     id: testScreen
@@ -52,8 +53,6 @@ Item {
                 if (services.isTestingComplete()) {
                     services.exportSubject()
                     goToHomeScreen()
-                } else if (services.getCurrentRepetition() === 1) {
-                    goToConfiguration()
                 } else {
                     goToInstructions()
                 }
@@ -61,88 +60,77 @@ Item {
         }
     }
 
-    // Title
+    // Title Label
     Label {
-        id: titleLabel
         text: testName
         height: 100
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            topMargin: 75
+            top: parent.top; topMargin: 75
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font {
-            family: "Space Mono"
-            pointSize: 56
-            styleName: "Bold"
+            family: Theme.fontFamily
+            pointSize: Theme.titleFontSize
+            bold: true
         }
     }
 
-    // Countdown label
+    // Countdown Label
     Label {
         id: countdownLabel
         visible: preTimer.running || testTimer.running
-        text: preTimer.running ? "Start Lifting in" :
+        text: preTimer.running ? "Start Lifting In:" :
               isTesting ? "Time Remaining:" : ""
-        height: 50
+        width: 800; height: 50
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            leftMargin: 200
-            rightMargin: 200
-            topMargin: 300
+            top: parent.top; topMargin: 300
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font {
-            family: "Space Mono"
-            pointSize: 32
+            family: Theme.fontFamily
+            pointSize: Theme.cdTitleFontSize
         }
     }
 
-    // Countdown label
+    // Countdown Label
     Label {
         id: countdownNumberLabel
         visible: preTimer.running || testTimer.running
         text: preTimer.running ? preCountdown :
               isTesting ? testCountdown : ""
-        height: 50
+        width: 800; height: 50
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            leftMargin: 200
-            rightMargin: 200
-            topMargin: 400
+            top: parent.top; topMargin: 400
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font {
-            family: "Space Mono"
-            pointSize: 42
+            family: Theme.fontFamily
+            pointSize: Theme.cdNumberFontSize
         }
     }
 
     // Repetition Label
     Label {
         id: repetitionLabel
-        height: 30
+        width: 800; height: 30
         visible: true
         text: "Repetition #" + services.getCurrentRepetition()
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.leftMargin: 200
-        anchors.rightMargin: 200
-        anchors.topMargin: 185
+        anchors {
+            top: parent.top; topMargin: 185
+            horizontalCenter: parent.horizontalCenter
+        }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        font.pointSize: 18
-        font.family: "Space Mono"
-        color: "#cdcdcd"
+        font {
+            family: Theme.fontFamily
+            pointSize: Theme.instructionFontSize
+        }
+        color: Theme.repTextColor
     }
 }

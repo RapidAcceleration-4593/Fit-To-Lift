@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import "../themes"
 
 Item {
     id: instructionScreen
@@ -12,46 +13,40 @@ Item {
     signal goToHomeScreen()
     signal goToInstructions()
     signal goToConfiguration()
-    
-    // Title
+
+    // Title Label
     Label {
         id: titleLabel
         text: testName
         height: 100
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            topMargin: 75
+            top: parent.top; topMargin: 75
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font {
-            family: "Space Mono"
-            pointSize: 56
-            styleName: "Bold"
+            family: Theme.fontFamily
+            pointSize: Theme.titleFontSize
+            bold: true
         }
     }
 
-    // Instructions
+    // Instructions Label
     Label {
         id: instructionsLabel
         text: "Instructions:\n"+ instructionsText
-        height: 50
+        width: 800; height: 50
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            leftMargin: 150
-            rightMargin: 150
-            topMargin: 320
+            top: parent.top; topMargin: 320
+            horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         wrapMode: Text.WordWrap
         font {
-            family: "Space Mono"
-            pointSize: 20
+            family: Theme.fontFamily
+            pointSize: Theme.instructionFontSize
         }
     }
 
@@ -61,37 +56,61 @@ Item {
         height: 30
         visible: true
         text: "Repetition #" + services.getCurrentRepetition()
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.leftMargin: 200
-        anchors.rightMargin: 200
-        anchors.topMargin: 185
+        anchors {
+            top: parent.top; topMargin: 185
+            horizontalCenter: parent.horizontalCenter
+        }
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        font.pointSize: 18
-        font.family: "Space Mono"
-        color: "#cdcdcd"
+        font {
+            family: Theme.fontFamily
+            pointSize: Theme.instructionFontSize
+        }
+        color: Theme.repTextColor
+    }
+
+    // Configuration Settings
+    Image {
+        id: settingsImage
+        property url defaultSource: "../resources/gear.png"
+        property url pressedSource: "../resources/gear_filled.png"
+        source: defaultSource
+        width: 95; height: 95
+        anchors {
+            left: parent.left; leftMargin: 15
+            bottom: parent.bottom; bottomMargin: 15
+        }
+
+        Timer {
+            id: downTimer
+            interval: 150
+            repeat: false
+            onTriggered: parent.source = parent.defaultSource
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+                parent.source = parent.pressedSource
+                downTimer.start()
+                goToConfiguration()
+            }
+        }
     }
 
     // Begin button
     Button {
-        id: beginButton
         text: "Begin"
-        height: 75
+        width: 250; height: 75
         anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            leftMargin: 500
-            rightMargin: 500
-            topMargin: 515
+            top: parent.top; topMargin: 515
+            horizontalCenter: parent.horizontalCenter
         }
         font {
-            family: "Space Mono"
-            pointSize: 22
+            family: Theme.fontFamily
+            pointSize: Theme.buttonFontSize
             bold: true
-            letterSpacing: 2
         }
         onClicked: goToTest()
     }
