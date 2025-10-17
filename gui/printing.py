@@ -1,7 +1,7 @@
 import datetime
 from personaldata import Person
-from PySide6.QtPrintSupport import QPrinter
-from PySide6.QtGui import QTextDocument
+import subprocess
+import platform
 
 def timestamp() -> str:
     time = datetime.datetime.now()
@@ -19,27 +19,29 @@ def timestamp() -> str:
     return f"{month}/{day}/{year} {hour}:{minutes} {appendix}"
 
 class Printer:
-    def __init__(self, qprinter: QPrinter, template_path):
+    def __init__(self, template_path):
         with open(template_path) as f:
             self.template = f.read()
             self.working_copy = self.template
-        self.printer = qprinter
     
     def clear_working_copy(self):
         self.working_copy = self.template
     
-    def print(self, dict: dict, printpath = "printed.txt"):
+    def print(self, dict: dict):
         self.clear_working_copy()
         for key in dict:
             if isinstance(dict[key], list):
                 self.populate_list(key, dict[key])
             else:
                 self.populate_item(key, dict[key])
-
-        doc = QTextDocument()        
-        doc.setPlainText(self.working_copy)
-        self.clear_working_copy()
-        doc.print_(self.printer)
+        
+        f = open("printed.txt", "w")
+        f.writelines(self.working_copy)
+        f.close()
+        if platform.system() == "Windows":
+            subprocess.Popen(["powershell", 'Get-Content "printed.txt" -ReadCount 0 | Out-Printer -Name "Generic / Text Only"'], shell=True)
+        else:
+            subprocess.Popen("lp printed.txt",shell=True)
 
     def populate_item(self, name: str, value):
         if name.startswith("@"):
@@ -54,8 +56,8 @@ class Printer:
             self.populate_item("@"+name+str(i), values[i])
 
 class PersonPrinter:
-    def __init__(self, qprinter):
-        self.printer = Printer(qprinter, "printing/templates/Label.prn")
+    def __init__(self):
+        self.printer = Printer("printing/templates/Label.prn")
     
     def print_person(self, person: Person):
         lifts = []
