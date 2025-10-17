@@ -12,7 +12,7 @@ import testmanager
 import printing
 from personaldata import Person
 
-MOCK_SERIAL = True
+MOCK_SERIAL = False
 NUM_REPETITIONS = 1
 
 def main():
