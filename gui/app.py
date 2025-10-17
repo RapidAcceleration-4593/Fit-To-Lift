@@ -10,6 +10,7 @@ import service
 import serialmanager
 import testmanager
 import printing
+from personaldata import Person
 
 MOCK_SERIAL = True
 NUM_REPETITIONS = 1
@@ -24,8 +25,14 @@ def main():
     serial_manager = serialmanager.SerialManager(serial_connection)
     test_manager = testmanager.TestManager(reps_per_test = NUM_REPETITIONS)
 
-    printer = QPrinter(QPrinterInfo.defaultPrinter())
-    person_printer = printing.WidePagePrinter(printer)
+    qprinter = QPrinter(QPrinterInfo.defaultPrinter())
+    print(qprinter.printerName())
+    p = Person()
+    p.add_measurement("Hey guy", 32)
+    p.add_measurement("Hey guy", 34)
+    p.add_measurement("other lift", 532)
+    person_printer = printing.PersonPrinter(qprinter)
+    person_printer.print_person(p)
 
     services = service.Services(serial_manager, test_manager, person_printer)
 

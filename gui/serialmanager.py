@@ -17,6 +17,7 @@ class MockSerial:
 
     def read_until(self, terminator: bytes = b"\n") -> bytes:
         value = str(random.randint(10, 100)) + "\n"
+        print(f"Mock Read: {value}")
         time.sleep(0.05)
         return value.encode()
     

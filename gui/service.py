@@ -126,5 +126,5 @@ class Services(QObject):
             await asyncio.sleep(0.01)
         await asyncio.sleep(0.1) # Magic wait to ensure all data is written to self.subject
 
-        self.printer.print(self.subject)
+        self.printer.print_person(self.subject)
         self.subject = personaldata.Person()
