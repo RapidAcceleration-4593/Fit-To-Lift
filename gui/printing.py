@@ -35,13 +35,13 @@ class Printer:
             else:
                 self.populate_item(key, dict[key])
         
-        f = open("printed.txt", "w")
+        f = open("printed.prn", "w")
         f.writelines(self.working_copy)
         f.close()
         if platform.system() == "Windows":
-            subprocess.Popen(["powershell", 'Get-Content "printed.txt" -ReadCount 0 | Out-Printer -Name "Generic / Text Only"'], shell=True)
+            subprocess.Popen(["powershell", 'Get-Content "printed.prn" -ReadCount 0 | Out-Printer -Name "Generic / Text Only"'], shell=True)
         else:
-            subprocess.Popen("lp printed.txt",shell=True)
+            subprocess.Popen("lp printed.prn",shell=True)
 
     def populate_item(self, name: str, value):
         if name.startswith("@"):
@@ -67,10 +67,10 @@ class PersonPrinter:
         for lift, measurements in person.measurements.items():
             lifts.append(lift)
 
-            mean = sum(measurements) / len(measurements)
+            mean = round(sum(measurements) / len(measurements))
             avgs.append(mean)
 
-            maxes.append(max(measurements))
+            maxes.append(round(max(measurements)))
         
         parameters = {
             "Name" : lifts,
