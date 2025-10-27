@@ -13,9 +13,11 @@ import printing
 from personaldata import Person
 
 MOCK_SERIAL = False
+MOCK_SERIAL = "mock=true" in sys.argv and not "mock=false" in sys.argv
 NUM_REPETITIONS = 1
 
 def main():
+    print(MOCK_SERIAL)
     os.environ["QT_QUICK_CONTROLS_CONF"] = os.path.join(os.path.dirname(__file__), "themes/qtquickcontrols2.conf")
 
     app = QApplication(sys.argv)
