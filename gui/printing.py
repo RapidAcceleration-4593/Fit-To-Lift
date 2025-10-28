@@ -3,6 +3,9 @@ from personaldata import Person
 import subprocess
 import platform
 
+class PrinterParsingException(Exception):
+    pass
+
 def timestamp() -> str:
     time = datetime.datetime.now()
 
@@ -20,6 +23,7 @@ def timestamp() -> str:
 
 class Printer:
     def __init__(self, template_path):
+        self.template_path = template_path
         with open(template_path) as f:
             self.template = f.read()
     
@@ -48,68 +52,86 @@ class Printer:
         for i in range(0, len(values)):
             w_target = self.populate_item(w_target, "@"+name+str(i), values[i])
         return w_target
+    
+    def create_parse_error(self, error_msg):
+        return PrinterParsingException(f"Problem in template file '{self.template_path}'\n\tParsing Error: {error_msg}")
 
-    def generate_print_string(self, dict: dict):
+    def generate_print_string(self, params: dict):
+        var_symbols = []
         # A list containing lists that describe a variable. The list contains:
         #   0: the name of the variable
         #   1: the position of the variable
         #   2: the size of the variable (e.g. {$foo} would have a size of 6)
-        #   3 (optional): the list index this variable is intended to access.
-        # Element 3 only occurs for array variables. The size of the list is
+        #   3: the type of the variable. Either @ (array) or $ (single element)
+        #   4 (optional): the list index this variable is intended to access.
+        # Element 4 only occurs for array variables. The size of the list is
         # how some sections of this function determine whether the variable
         # descriptor is an array or single element variable: do not touch.
         vars = [] 
 
         i = 0
         while i < len(self.template) - 2:
-            # If start of variable expression, process. Otherwise, continue on to next index.
-            if self.template[i] == '{' and self.template[i+1] in ('$', '@'): # $: single element variable. @: array element variable.
-                # Find end of variable expression
-                j = i + 2
-                while j < len(self.template) and self.template[j] != '}':
-                    if self.template[j] == '{':
-                        raise Exception("Printer parsing error: Attempted to start new variable name without terminating previous.")
-                    j += 1
-                
-                var_name = self.template[i+2:j] # The variable name is the word(s) between the brackets
-                if len(var_name) < 1:
-                    raise Exception("Printer parsing error: cannot have variable name of length zero.")
-                
-                is_list = self.template[i+1] == '@'
-                if is_list:
-                    # If the variable is a list variable, it will end with digits of a certain length
-                    # denoting the index it is intended to access. We must strip these from the variable name.
-                    k = len(var_name)
-                    while var_name[k-1].isdigit():
-                        k -= 1
-                    if k == len(var_name):
-                        raise Exception("Printer parsing error: list element does not have index. Look for {@list123} elements that do not have numbers.")
-                    index = int(var_name[k:])
-                    var_name = var_name[:k]
-                    vars.append([var_name, i, j-i+1, index]) # Add the array variable descriptor to the variables list.
-                else:
-                    vars.append([var_name, i, j-i+1]) # Single element variable; therefore no index element.
-                i = j + 1 # Since we found a variable, we can skip to the end of it to search for the next.
-            i += 1
+            # If not start of variable expression, continue to next index.
+            if self.template[i] != '{' or self.template[i+1] not in ('$', '@'): # $: single element variable. @: array element variable.
+                i += 1
+                continue
+
+            # Find end of variable expression
+            j = i + 2
+            while j < len(self.template) and self.template[j] != '}':
+                if self.template[j] == '{':
+                    raise self.create_parse_error(f"{self.template[i:j+1]} is invalid variable name. Cannot start new variable without terminating previous.")
+                j += 1
+
+            var_type = self.template[i+1]
+            var_name = self.template[i+2:j]
+            if len(var_name) == 0:
+                raise self.create_parse_error(f"Variable {self.template[i:j+1]} has name length of zero.")
+            elif var_name[0].isdigit():
+                raise self.create_parse_error(f"Variable {self.template[i:j+1]} has name which begins with digit.")
+            vars.append([var_name, i, j-i+1, var_type])
+            
+            i = j + 1 # Since we found a variable, we can skip to the end of it to search for the next.
+        
+        # Further process array variables to determine their index
+        for var in vars:
+            is_list = var[3] == '@'
+            if not is_list:
+                continue
+            var_name = var[0]
+            # If the variable is a list variable, it will end with digits of a certain length
+            # denoting the index it is intended to access. We must strip these from the variable name.
+            k = len(var_name)
+            while var_name[k-1].isdigit():
+                k -= 1
+            if k == len(var_name):
+                raise self.create_parse_error(f"List element variable {self.template[var[1]:var[1]+var[2]]} does not have index.")
+            index = int(var_name[k:])
+
+            var[0] = var_name[:k]
+            var.append(index)
         
         printstring = self.template
+        populated_fields = [] 
 
-        # Populate the values from dict into the printstring
+        # Populate the values from the params dict into the printstring
         while len(vars) > 0:
             # The value that will be substituted for the variable in the printstring
             var_value = " "
 
             # Iterate through each key in the parameters dictionary. If there is a match between a parameter
             # name and a variable name, change var_value to the value of the parameter.
-            for key in dict:
+            for key in params:
                 if vars[0][0] != key:
                     continue
-                if len(vars[0]) == 4: # List variable
-                    if vars[0][3] < len(dict[key]):
-                        var_index = vars[0][3]
-                        var_value = str(dict[key][var_index]) # Access the correct element of the list
+                if key not in populated_fields:
+                    populated_fields.append(key)
+                if len(vars[3]) == '@': # List variable
+                    if vars[0][4] < len(params[key]):
+                        var_index = vars[0][4]
+                        var_value = str(params[key][var_index]) # Access the correct element of the list
                 else: # Regular variable
-                    var_value = str(dict[key])
+                    var_value = str(params[key])
                 break
 
             if len(var_value) < 1: var_value = " "
@@ -120,13 +142,14 @@ class Printer:
 
             # d_index is the difference in lengths of the original variable. It is important to shift the indices of
             # all the following variables by this value, otherwise we will attempt to modify the wrong portion of text.
-            print(var_value)
-            print("{@"+vars[0][0]+"}")
             d_index = len(var_value) - vars[0][2]
-            print(d_index)
-            vars.pop(0)
             for entry in vars:
                 entry[1] += d_index
+            vars.pop(0)
+        
+        for key in params:
+            if key not in populated_fields:
+                print(f"Printer Warning: parameter '{key}' was not populated into printstring.")
 
         return printstring
 
