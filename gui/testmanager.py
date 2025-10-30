@@ -10,8 +10,8 @@ _tests: list[dict[str, Any]] = [
     { "setpoint-calculator" : _absolute_generator(6), "name" : "Floor-Level Lift", "instructions" : "Squat down, grip the bar with both hands, and lift straight up using your legs. Keep your back straight." },
     { "setpoint-calculator" : _absolute_generator(15), "name" : "Knee-Level Lift", "instructions" : "Squat slightly, grip the bar just below your knees, and stand up tall, driving through your legs." },
     { "setpoint-calculator" : _proportional_generator(.5), "name" : "Waist-Level Lift", "instructions" : "Stand close, grip the bar at waist height, and curl it straight up to your chest. Keep elbows near your torso." },
-    { "setpoint-calculator" : _absolute_generator(60), "name" : "Shoulder-Level, Arms In", "instructions" : "Grip the bar at shoulder height with forearms vertical beneath the bar, and push upward." },
-    { "setpoint-calculator" : _absolute_generator(60), "name" : "Shoulder-Level, Arms Out", "instructions" : "Step back, and grip the bar wider. Arms should be straight and wrists pointing up. Lift upward." }
+    { "setpoint-calculator" : _absolute_generator(60), "name" : "Shoulder-Level, Arms In", "instructions" : "Grip the bar at shoulder height, with forearms vertical beneath the bar, and push upward." },
+    { "setpoint-calculator" : _absolute_generator(60), "name" : "Shoulder-Level, Arms Out", "instructions" : "Step back and grip the bar wider. Arms should be straight, and wrists pointing up. Lift upward." }
 ]
 
 class TestManager:
