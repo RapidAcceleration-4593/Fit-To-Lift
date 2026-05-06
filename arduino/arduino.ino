@@ -269,7 +269,14 @@ void printLoadCellReading() {
 }
 
 double readLoadCellLbs() {
-  return analogRead(LOAD_CELL);
+  double sum = 0;
+
+  for (int i = 0; i < 10000; i++) {
+    sum += analogRead(LOAD_CELL);
+    delayMicroseconds(500);
+  }
+
+  return sum / 10000.0;
 }
 
 void emergencyStop() {
